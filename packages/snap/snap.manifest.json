@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example",
+  "description": "Metamask Snap for Hoosat Network",
+  "proposedName": "Hoosat Network",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "Gfr8rFPI5RjGo4ipE1RHD+aBxx19Tv+wGOGd1cnaI+E=",
+    "shasum": "1PQbObd7+SIi6oxlud7KWBEbPP/sUz55tnyS3tnSnsc=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -18,10 +18,19 @@
   },
   "initialPermissions": {
     "snap_dialog": {},
+    "snap_manageState": {},
+    "snap_getBip32Entropy": [
+      {
+        "path": ["m", "44'", "999999'"],
+        "curve": "secp256k1"
+      }
+    ],
+    "endowment:network-access": {},
     "endowment:rpc": {
       "dapps": true,
       "snaps": false
-    }
+    },
+    "endowment:page-home": {}
   },
   "platformVersion": "9.3.0",
   "manifestVersion": "0.1"

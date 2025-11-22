@@ -27,7 +27,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "@metamask/snaps-sdk": "~9.3.0"
+    "@metamask/snaps-sdk": "~9.3.0",
+    "hoosat-sdk-web": "^0.1.5"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
