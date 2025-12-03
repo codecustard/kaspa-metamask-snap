@@ -1,0 +1,65 @@
+
+import { HoosatUtils } from 'hoosat-sdk-web';
+import { client } from '../util/client';
+import { getWallet } from '../util/wallet';
+
+export interface BalanceResult {
+  balance: string;
+  confirmed: string;
+  unconfirmed: string;
+  [key: string]: any;
+}
+
+export interface DebugBalanceResult {
+  address: string;
+  rawBalance: string;
+  isRealAddress: boolean;
+  [key: string]: any;
+}
+
+/**
+ * Get balance for an address
+ */
+export async function getBalance(address?: string): Promise<BalanceResult> {
+  try {
+    const wallet = await getWallet();
+    const targetAddress = address || wallet.address;
+
+    const balanceResult = await client.getBalance(targetAddress);
+    const confirmedBalance = HoosatUtils.sompiToAmount(balanceResult.balance || '0');
+
+    return {
+      balance: confirmedBalance.toString(),
+      confirmed: confirmedBalance.toString(),
+      unconfirmed: '0.00000000',
+    };
+  } catch (error) {
+    return {
+      balance: '0.00000000',
+      confirmed: '0.00000000',
+      unconfirmed: '0.00000000',
+    };
+  }
+}
+
+/**
+ * Debug balance call for troubleshooting
+ */
+export async function debugBalance(): Promise<DebugBalanceResult | { error: string }> {
+  try {
+    const wallet = await getWallet();
+    console.log('Debug wallet:', wallet);
+
+    const balanceResult = await client.getBalance(wallet.address);
+    console.log('Debug balance result:', balanceResult);
+
+    return {
+      address: wallet.address,
+      rawBalance: JSON.stringify(balanceResult),
+      isRealAddress: wallet.address.startsWith('hoosat:') && !wallet.address.includes('qr1234'),
+    };
+  } catch (error) {
+    console.error('Debug balance error:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
