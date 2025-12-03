@@ -6,7 +6,7 @@ import {
   Text,
   Button,
   Divider,
-  Bold,
+  Copyable,
 } from '@metamask/snaps-sdk/jsx';
 
 import { getWallet } from '../../util/wallet';
@@ -34,9 +34,7 @@ export async function receive(id: string) {
             <Divider />
 
             <Text>Your Address:</Text>
-            <Text>
-              <Bold>{address}</Bold>
-            </Text>
+            <Copyable value={address} />
 
             <Divider />
 

@@ -4,6 +4,7 @@ import {
   Text,
   Bold,
   Divider,
+  Button,
   SnapComponent,
 } from '@metamask/snaps-sdk/jsx';
 
@@ -12,7 +13,6 @@ interface Transaction {
   amount: string;
   type: 'received' | 'sent';
   timestamp: number;
-  confirmations: number;
 }
 
 interface Props {
@@ -35,7 +35,7 @@ export const TransactionHistory: SnapComponent<Props> = ({ transactions }) => {
   }
 
   const txElements = [];
-  const txsToShow = transactions.slice(0, 3);
+  const txsToShow = transactions.slice(0, 4);
 
   for (let i = 0; i < txsToShow.length; i++) {
     const tx = txsToShow[i]!;
@@ -44,16 +44,14 @@ export const TransactionHistory: SnapComponent<Props> = ({ transactions }) => {
       <Box key={`tx-${i}`} direction="horizontal" alignment="space-between">
         <Box direction="horizontal">
           <Box direction="vertical" alignment="start">
-            <Text>
+            <Text color={tx.type === 'received' ? 'success' : 'error'}>
               <Bold>
                 {tx.type === 'received' ? '+' : '-'}
                 {parseFloat(tx.amount).toFixed(8)} HTN
               </Bold>
             </Text>
-            <Text color="alternative">
-              {tx.confirmations > 0
-                ? `${tx.confirmations.toString()} confirmations`
-                : 'Pending confirmation'}
+            <Text color={tx.type === 'received' ? 'success' : 'error'}>
+              {tx.type === 'received' ? 'Received' : 'Sent'}
             </Text>
           </Box>
         </Box>
@@ -61,9 +59,9 @@ export const TransactionHistory: SnapComponent<Props> = ({ transactions }) => {
           <Text color="alternative">
             {new Date(tx.timestamp).toLocaleDateString()}
           </Text>
-          <Text color="muted">
+          <Button name={`viewTransaction:${tx.txid}`}>
             {tx.txid.slice(0, 12)}...
-          </Text>
+          </Button>
         </Box>
       </Box>
     );

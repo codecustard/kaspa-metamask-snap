@@ -6,6 +6,7 @@ import {
   Text,
   Button,
   Icon,
+  Copyable,
 } from '@metamask/snaps-sdk/jsx';
 
 import { TotalBalance } from './partials/TotalBalance';
@@ -36,9 +37,13 @@ export function home(props: HomeProps) {
         {/* <Box direction="vertical" alignment="center">
           <Heading size="md">Address</Heading>
         </Box> */}
-        <Text color="alternative">
-          {hideBalance ? '●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●' : address}
-        </Text>
+{hideBalance ? (
+          <Text color="alternative">
+            ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
+          </Text>
+        ) : (
+          <Copyable value={address} />
+        )}
 
         <Box direction="horizontal" alignment="space-around">
           <CTA icon="wallet" name="send" label="Send" />
@@ -55,21 +60,6 @@ export function home(props: HomeProps) {
         </Box>
 
         <TransactionHistory transactions={transactions} />
-
-        <Box direction="horizontal" alignment="space-between">
-          <Box direction="vertical" alignment="center">
-            <Text color="alternative">Network</Text>
-            <Text>Mainnet</Text>
-          </Box>
-          <Box direction="vertical" alignment="center">
-            <Text color="alternative">Block Height</Text>
-            <Text>Latest</Text>
-          </Box>
-          <Box direction="vertical" alignment="center">
-            <Text color="alternative">Confirmations</Text>
-            <Text>6+</Text>
-          </Box>
-        </Box>
       </Box>
     </Container>
   );

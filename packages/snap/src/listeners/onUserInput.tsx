@@ -7,10 +7,13 @@ import {
   Heading,
   Text,
   Button,
+  Copyable,
 } from '@metamask/snaps-sdk/jsx';
-import { send, receive, reviewSend, confirmSend, home, viewUTXOs } from '../ui';
+import { send, receive, reviewSend, confirmSend, home, viewUTXOs, transactionDetails, allTransactions } from '../ui';
 import { getWallet } from '../util/wallet';
 import { getTransactions } from '../rpc/getTransactions';
+import { getAllTransactions } from '../rpc/getAllTransactions';
+import { getTransactionDetails } from '../rpc/getTransactionDetails';
 import { HoosatUtils } from 'hoosat-sdk-web';
 import { client } from '../util/client';
 
@@ -112,8 +115,17 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
         break;
 
       case 'viewAllTransactions':
-        // Refresh home page with updated transactions
-        await refreshHomePage(id);
+        // Show full transaction history screen
+        const allTransactionHistory = await getAllTransactions();
+        await snap.request({
+          method: 'snap_updateInterface',
+          params: {
+            id,
+            ui: allTransactions({
+              transactions: allTransactionHistory.transactions,
+            }),
+          },
+        });
         break;
 
       case 'viewUTXOs':
@@ -127,6 +139,34 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
       case 'goBack':
         // Go back to home page
         await refreshHomePage(id);
+        break;
+
+      case 'showDebug':
+      case 'hideDebug':
+        // Get the current transaction ID from context or state
+        if (context && context.transactionId) {
+          const wallet = await getWallet();
+          const transactionDetail = await getTransactionDetails(String(context.transactionId));
+
+          if (transactionDetail) {
+            await snap.request({
+              method: 'snap_updateInterface',
+              params: {
+                id,
+                ui: transactionDetails({
+                  transaction: transactionDetail,
+                  userAddress: wallet.address,
+                  showDebug: event.name === 'showDebug'
+                }),
+                // Preserve the transaction context so subsequent debug
+                // toggles continue to have access to the transactionId.
+                context: {
+                  transactionId: String(context.transactionId),
+                },
+              },
+            });
+          }
+        }
         break;
 
       case 'settings':
@@ -158,16 +198,14 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                     <Heading>UTXO Details</Heading>
 
                     <Text>Transaction Explorer:</Text>
-                    <Text color="alternative" size="sm">
-                      {txExplorerUrl}
-                    </Text>
+                    <Copyable value={txExplorerUrl} />
 
                     <Text>Address Explorer:</Text>
-                    <Text color="alternative" size="sm">
-                      {addressExplorerUrl}
-                    </Text>
+                    <Copyable value={addressExplorerUrl} />
 
-                    <Text>TX ID: {txId || 'Unknown'}</Text>
+                    <Text>TX ID:</Text>
+                    <Copyable value={txId || 'Unknown'} />
+
                     <Text>Index: {index || 'Unknown'}</Text>
 
                     <Button name="goBack" variant="primary">Go Back</Button>
@@ -179,6 +217,50 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
           break;
         }
 
+        // Check if it's a transaction view event
+        if (event.name?.startsWith('viewTransaction:')) {
+          const txId = event.name.substring(16); // Remove 'viewTransaction:' prefix
+          const wallet = await getWallet();
+
+          const transactionDetail = await getTransactionDetails(txId);
+
+          if (transactionDetail) {
+            await snap.request({
+              method: 'snap_updateInterface',
+              params: {
+                id,
+                ui: transactionDetails({
+                  transaction: transactionDetail,
+                  userAddress: wallet.address,
+                  showDebug: false
+                }),
+                context: {
+                  transactionId: txId
+                }
+              },
+            });
+          } else {
+            // Show error if transaction details couldn't be fetched
+            await snap.request({
+              method: 'snap_updateInterface',
+              params: {
+                id,
+                ui: (
+                  <Container>
+                    <Box>
+                      <Heading>Transaction Details</Heading>
+                      <Text color="error">
+                        Failed to load transaction details
+                      </Text>
+                      <Button name="goBack" variant="primary">Go Back</Button>
+                    </Box>
+                  </Container>
+                ),
+              },
+            });
+          }
+          break;
+        }
 
         console.warn('Unknown event:', event.name, 'Available events: send, receive, sendReview, sendConfirm, backToHome, refreshBalances, hideBalance, showBalance, viewAllTransactions, viewUTXOs, refreshUTXOs, goBack, copyAddress, settings');
         break;

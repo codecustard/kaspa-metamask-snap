@@ -1,4 +1,3 @@
-
 import { getWallet } from '../util/wallet';
 import { HoosatUtils } from 'hoosat-sdk-web';
 
@@ -11,9 +10,9 @@ export interface Transaction {
 }
 
 /**
- * Get transaction history from Hoosat network
+ * Get full transaction history from Hoosat network (more transactions than the home page)
  */
-export async function getTransactions(address?: string): Promise<{ transactions: Transaction[] }> {
+export async function getAllTransactions(address?: string, limit = 50): Promise<{ transactions: Transaction[] }> {
   try {
     let walletAddress = address;
 
@@ -23,7 +22,7 @@ export async function getTransactions(address?: string): Promise<{ transactions:
     }
 
     // Fetch transaction history using the Hoosat explorer API with resolved inputs
-    const transactionsResponse = await fetch(`https://api.network.hoosat.fi/addresses/${walletAddress}/full-transactions?limit=20&offset=0&resolve_previous_outpoints=light`, {
+    const transactionsResponse = await fetch(`https://api.network.hoosat.fi/addresses/${walletAddress}/full-transactions?limit=${limit}&offset=0&resolve_previous_outpoints=light`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -95,7 +94,7 @@ export async function getTransactions(address?: string): Promise<{ transactions:
     transactions.sort((a, b) => b.timestamp - a.timestamp);
 
     return {
-      transactions: transactions.slice(0, 10)
+      transactions: transactions
     };
 
   } catch (error) {
