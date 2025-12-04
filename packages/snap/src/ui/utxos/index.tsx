@@ -18,6 +18,8 @@ interface UTXOsPageProps {
 export function utxosPage(props: UTXOsPageProps) {
   const { utxos, address } = props;
 
+  const shouldShowCompound = utxos && utxos.length > 1;
+
   return (
     <Container>
       <Box>
@@ -30,9 +32,16 @@ export function utxosPage(props: UTXOsPageProps) {
 
         <Box direction="horizontal" alignment="space-between">
           <Heading size="md">Address</Heading>
-          <Button name="refreshUTXOs" variant="primary">
-            <Icon color="primary" name="refresh" />
-          </Button>
+          <Box direction="horizontal">
+            {shouldShowCompound && (
+              <Button name="compoundUTXOs" variant="primary">
+                <Icon color="primary" name="coin" />
+              </Button>
+            )}
+            <Button name="refreshUTXOs" variant="primary">
+              <Icon color="primary" name="refresh" />
+            </Button>
+          </Box>
         </Box>
 
         <UTXOList utxos={utxos} />

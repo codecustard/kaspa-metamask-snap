@@ -19,11 +19,13 @@ interface HomeProps {
   hideBalance?: boolean;
   transactions?: any[];
   debugMessage?: string;
+  shouldSuggestCompound?: boolean;
+  utxoCount?: number;
   [key: string]: any;
 }
 
 export function home(props: HomeProps) {
-  const { balance, address, hideBalance = false, transactions = [], debugMessage } = props;
+  const { balance, address, hideBalance = false, transactions = [], debugMessage, shouldSuggestCompound = false, utxoCount = 0 } = props;
 
   return (
     <Container>
@@ -43,6 +45,20 @@ export function home(props: HomeProps) {
           </Text>
         ) : (
           <Copyable value={address} />
+        )}
+
+        {shouldSuggestCompound && (
+          <Box direction="vertical" alignment="center">
+            <Text color="error">
+              Too many UTXOs detected ({utxoCount.toString()})!
+            </Text>
+            <Text color="alternative">
+              Consider compounding to improve transaction efficiency
+            </Text>
+            <Button name="compoundUTXOs" variant="destructive">
+              Compound UTXOs
+            </Button>
+          </Box>
         )}
 
         <Box direction="horizontal" alignment="space-around">

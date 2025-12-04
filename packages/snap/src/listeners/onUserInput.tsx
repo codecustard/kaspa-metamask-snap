@@ -14,6 +14,7 @@ import { getWallet } from '../util/wallet';
 import { getTransactions } from '../rpc/getTransactions';
 import { getAllTransactions } from '../rpc/getAllTransactions';
 import { getTransactionDetails } from '../rpc/getTransactionDetails';
+import { compoundTransaction, shouldSuggestCompound } from '../rpc/compoundTransaction';
 import { HoosatUtils } from 'hoosat-sdk-web';
 import { client } from '../util/client';
 
@@ -42,6 +43,9 @@ async function refreshHomePage(id: string, hideBalance = false) {
   // Get transaction history
   const transactionHistory = await getTransactions();
 
+  // Check if we should suggest compound
+  const compoundSuggestion = await shouldSuggestCompound();
+
   await snap.request({
     method: 'snap_updateInterface',
     params: {
@@ -52,6 +56,8 @@ async function refreshHomePage(id: string, hideBalance = false) {
         hideBalance,
         transactions: transactionHistory.transactions,
         debugMessage: `Refreshed at ${new Date().toLocaleTimeString()}`,
+        shouldSuggestCompound: compoundSuggestion.suggest,
+        utxoCount: compoundSuggestion.utxoCount,
       }),
     },
   });
@@ -138,7 +144,88 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
         break;
 
       case 'refreshUTXOs':
+      case 'refreshAndViewUTXOs':
         await viewUTXOs(id);
+        break;
+
+      case 'compoundUTXOs':
+        // Compound/consolidate UTXOs
+        try {
+          const compoundResult = await compoundTransaction();
+
+          if (compoundResult.success) {
+            await snap.request({
+              method: 'snap_updateInterface',
+              params: {
+                id,
+                ui: (
+                  <Container>
+                    <Box>
+                      <Heading>Compound Successful</Heading>
+                      <Text color="success">
+                        Successfully consolidated {compoundResult.utxosConsolidated?.toString() || '0'} UTXOs
+                      </Text>
+                      <Text color="alternative">
+                        Total Amount: {compoundResult.totalAmount || '0'} HTN
+                      </Text>
+                      <Text color="alternative">
+                        Transaction ID: {compoundResult.txId?.slice(0, 16) || ''}...
+                      </Text>
+                      <Text color="muted">
+                        Note: It may take a few moments for the blockchain to update
+                      </Text>
+                      <Button name="refreshAndViewUTXOs" variant="primary">Refresh UTXOs</Button>
+                      <Button name="backToHome">Home</Button>
+                    </Box>
+                  </Container>
+                ),
+              },
+            });
+          } else {
+            await snap.request({
+              method: 'snap_updateInterface',
+              params: {
+                id,
+                ui: (
+                  <Container>
+                    <Box>
+                      <Heading>Compound Failed</Heading>
+                      <Text color="error">
+                        {compoundResult.error || 'Unknown error occurred'}
+                      </Text>
+                      {compoundResult.error?.includes('already spent') ? (
+                        <Text color="alternative">
+                          This usually means a previous compound was successful but the UI needs to refresh.
+                        </Text>
+                      ) : null}
+                      <Button name="refreshAndViewUTXOs" variant="primary">Refresh UTXOs</Button>
+                      <Button name="backToHome">Home</Button>
+                    </Box>
+                  </Container>
+                ),
+              },
+            });
+          }
+        } catch (error) {
+          await snap.request({
+            method: 'snap_updateInterface',
+            params: {
+              id,
+              ui: (
+                <Container>
+                  <Box>
+                    <Heading>Compound Error</Heading>
+                    <Text color="error">
+                      Failed to compound UTXOs: {error instanceof Error ? error.message : String(error)}
+                    </Text>
+                    <Button name="viewUTXOs" variant="primary">Back to UTXOs</Button>
+                    <Button name="backToHome">Home</Button>
+                  </Box>
+                </Container>
+              ),
+            },
+          });
+        }
         break;
 
       case 'goBack':
