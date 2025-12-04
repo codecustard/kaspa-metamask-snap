@@ -17,10 +17,16 @@ interface Transaction {
 
 interface Props {
   transactions: Transaction[];
+  currentPage?: number;
   [key: string]: any;
 }
 
-export function allTransactions({ transactions }: Props) {
+export function allTransactions({ transactions, currentPage = 1 }: Props) {
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil(transactions.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentTransactions = transactions.slice(startIndex, endIndex);
   return (
     <Container>
       <Box direction="vertical">
@@ -45,11 +51,16 @@ export function allTransactions({ transactions }: Props) {
           </Box>
         ) : (
           <Box direction="vertical">
-            <Text color="alternative">
-              Showing {transactions.length.toString()} transactions
-            </Text>
+            <Box direction="horizontal" alignment="space-between">
+              <Text color="alternative">
+                Showing {(startIndex + 1).toString()}-{Math.min(endIndex, transactions.length).toString()} of {transactions.length.toString()} transactions
+              </Text>
+              <Text color="alternative">
+                Page {currentPage.toString()} of {totalPages.toString()}
+              </Text>
+            </Box>
 
-            {transactions.map((tx, index) => (
+            {currentTransactions.map((tx, index) => (
               <Box key={`tx-${index}`} direction="vertical">
                 <Box direction="horizontal" alignment="space-between">
                   <Box direction="horizontal">
@@ -74,9 +85,48 @@ export function allTransactions({ transactions }: Props) {
                     </Button>
                   </Box>
                 </Box>
-                {index < transactions.length - 1 && <Divider />}
+                {index < currentTransactions.length - 1 && <Divider />}
               </Box>
             ))}
+
+            {totalPages > 1 && (
+              <Box direction="vertical">
+                <Divider />
+                <Box direction="horizontal" alignment="space-between">
+                  <Button
+                    name="firstPage"
+                    variant={currentPage > 1 ? "primary" : "destructive"}
+                    disabled={currentPage <= 1}
+                  >
+                    First
+                  </Button>
+                  <Button
+                    name="previousPage"
+                    variant={currentPage > 1 ? "primary" : "destructive"}
+                    disabled={currentPage <= 1}
+                  >
+                    Previous
+                  </Button>
+                  <Text color="alternative">
+                    Page {currentPage.toString()} of {totalPages.toString()}
+                  </Text>
+                  <Button
+                    name="nextPage"
+                    variant={currentPage < totalPages ? "primary" : "destructive"}
+                    disabled={currentPage >= totalPages}
+                  >
+                    Next
+                  </Button>
+                  <Button
+                    name="lastPage"
+                    variant={currentPage < totalPages ? "primary" : "destructive"}
+                    disabled={currentPage >= totalPages}
+                  >
+                    Last
+                  </Button>
+                </Box>
+              </Box>
+            )}
           </Box>
         )}
       </Box>

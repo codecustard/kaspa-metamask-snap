@@ -123,7 +123,12 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
             id,
             ui: allTransactions({
               transactions: allTransactionHistory.transactions,
+              currentPage: 1,
             }),
+            context: {
+              currentPage: 1,
+              totalTransactions: allTransactionHistory.transactions.length,
+            },
           },
         });
         break;
@@ -139,6 +144,49 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
       case 'goBack':
         // Go back to home page
         await refreshHomePage(id);
+        break;
+
+      case 'nextPage':
+      case 'previousPage':
+      case 'firstPage':
+      case 'lastPage':
+        // Handle pagination for transaction history
+        const currentPageFromContext = (context?.currentPage || 1) as number;
+        const paginatedTransactionHistory = await getAllTransactions();
+        const totalPages = Math.ceil(paginatedTransactionHistory.transactions.length / 10);
+
+        let newPage: number;
+        switch (event.name) {
+          case 'nextPage':
+            newPage = currentPageFromContext + 1;
+            break;
+          case 'previousPage':
+            newPage = currentPageFromContext - 1;
+            break;
+          case 'firstPage':
+            newPage = 1;
+            break;
+          case 'lastPage':
+            newPage = totalPages;
+            break;
+          default:
+            newPage = currentPageFromContext;
+        }
+
+        await snap.request({
+          method: 'snap_updateInterface',
+          params: {
+            id,
+            ui: allTransactions({
+              transactions: paginatedTransactionHistory.transactions,
+              currentPage: newPage,
+            }),
+            context: {
+              currentPage: newPage,
+              totalTransactions: paginatedTransactionHistory.transactions.length,
+            },
+          },
+        });
         break;
 
       case 'showDebug':
