@@ -169,8 +169,13 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                         Total Amount: {compoundResult.totalAmount || '0'} HTN
                       </Text>
                       <Text color="alternative">
-                        Transaction ID: {compoundResult.txId?.slice(0, 16) || ''}...
+                        Transaction ID:
                       </Text>
+                      <Copyable value={compoundResult.txId || 'N/A'} />
+                      <Text color="alternative">
+                        Explorer Link:
+                      </Text>
+                      <Copyable value={`https://explorer.hoosat.fi/txs/${compoundResult.txId || ''}`} />
                       <Text color="muted">
                         Note: It may take a few moments for the blockchain to update
                       </Text>

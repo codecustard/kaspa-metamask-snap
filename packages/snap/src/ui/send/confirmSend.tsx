@@ -7,6 +7,7 @@ import {
   Button,
   Bold,
   Divider,
+  Copyable,
 } from '@metamask/snaps-sdk/jsx';
 
 import { sendTransaction } from '../../rpc/sendTransaction';
@@ -35,7 +36,7 @@ export async function confirmSend(
                 <Text>
                   <Bold>Transaction ID:</Bold>
                 </Text>
-                <Text>{result.txId}</Text>
+                <Copyable value={result.txId || 'N/A'} />
 
                 <Divider />
 
@@ -43,8 +44,9 @@ export async function confirmSend(
                   <Bold>Amount:</Bold> {amount} HTN
                 </Text>
                 <Text>
-                  <Bold>To:</Bold> {recipient}
+                  <Bold>To:</Bold>
                 </Text>
+                <Copyable value={recipient} />
 
                 <Divider />
 
@@ -70,7 +72,7 @@ export async function confirmSend(
                 <Text>
                   <Bold>Error:</Bold>
                 </Text>
-                <Text>{result.error}</Text>
+                <Text>{result.error || 'Unknown error'}</Text>
 
                 <Divider />
 
