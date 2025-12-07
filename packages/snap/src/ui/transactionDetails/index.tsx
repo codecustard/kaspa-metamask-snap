@@ -108,21 +108,21 @@ export function transactionDetails({
           </Text>
         </Box>
 
-        {transaction.block_time && (
+        {transaction.blockTime ? (
           <Box direction="vertical">
             <Text>
               <Bold>Date:</Bold>
             </Text>
-            <Text>{new Date(transaction.block_time).toLocaleString()}</Text>
+            <Text>{new Date(transaction.blockTime).toLocaleString()}</Text>
           </Box>
-        )}
+        ) : null}
 
         <Box direction="vertical">
           <Text>
             <Bold>Status:</Bold>
           </Text>
-          <Text color={transaction.is_accepted ? 'success' : 'warning'}>
-            {transaction.is_accepted ? 'Confirmed' : 'Pending'}
+          <Text color={transaction.isAccepted ? 'success' : 'warning'}>
+            {transaction.isAccepted ? 'Confirmed' : 'Pending'}
           </Text>
         </Box>
 
