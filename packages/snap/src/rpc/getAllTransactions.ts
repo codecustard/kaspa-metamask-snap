@@ -1,18 +1,26 @@
-import { getWallet } from '../util/wallet';
 import { HoosatUtils } from 'hoosat-sdk-web';
 
-export interface Transaction {
+import { getWallet } from '../util/wallet';
+
+export type Transaction = {
   txid: string;
   amount: string;
   type: 'received' | 'sent';
   timestamp: number;
   [key: string]: any;
-}
+};
 
 /**
  * Get full transaction history from Hoosat network (more transactions than the home page)
+ *
+ * @param address - Wallet address to fetch transactions for
+ * @param limit - Maximum number of transactions to fetch
+ * @returns Promise that resolves to transaction history object
  */
-export async function getAllTransactions(address?: string, limit = 50): Promise<{ transactions: Transaction[] }> {
+export async function getAllTransactions(
+  address?: string,
+  limit = 50,
+): Promise<{ transactions: Transaction[] }> {
   try {
     let walletAddress = address;
 
@@ -22,10 +30,13 @@ export async function getAllTransactions(address?: string, limit = 50): Promise<
     }
 
     // Fetch transaction history using the Hoosat explorer API with resolved inputs
-    const transactionsResponse = await fetch(`https://api.network.hoosat.fi/addresses/${walletAddress}/full-transactions?limit=${limit}&offset=0&resolve_previous_outpoints=light`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const transactionsResponse = await fetch(
+      `https://api.network.hoosat.fi/addresses/${walletAddress}/full-transactions?limit=${limit}&offset=0&resolve_previous_outpoints=light`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
 
     const transactions: Transaction[] = [];
 
@@ -35,7 +46,9 @@ export async function getAllTransactions(address?: string, limit = 50): Promise<
       if (Array.isArray(transactionsData)) {
         // Process transactions from the explorer API
         for (const tx of transactionsData) {
-          if (!tx.transaction_id) continue;
+          if (!tx.transaction_id) {
+            continue;
+          }
 
           // Determine if this transaction involves our address and calculate amounts
           let totalReceived = 0;
@@ -47,7 +60,7 @@ export async function getAllTransactions(address?: string, limit = 50): Promise<
           if (tx.outputs && Array.isArray(tx.outputs)) {
             for (const output of tx.outputs) {
               if (output.script_public_key_address === walletAddress) {
-                totalReceived += parseInt(output.amount || '0');
+                totalReceived += parseInt(output.amount || '0', 10);
                 hasIncomingOutput = true;
               }
             }
@@ -58,7 +71,10 @@ export async function getAllTransactions(address?: string, limit = 50): Promise<
             for (const input of tx.inputs) {
               if (input.previous_outpoint_address === walletAddress) {
                 hasOutgoingInput = true;
-                totalSent += parseInt(input.previous_outpoint_amount || '0');
+                totalSent += parseInt(
+                  input.previous_outpoint_amount || '0',
+                  10,
+                );
               }
             }
           }
@@ -71,19 +87,25 @@ export async function getAllTransactions(address?: string, limit = 50): Promise<
             // If we have outgoing inputs, this is a sent transaction (even if we also receive change)
             type = 'sent';
             const netSent = totalSent - totalReceived;
-            amount = HoosatUtils.sompiToAmount(Math.abs(netSent).toString()).toString();
+            amount = HoosatUtils.sompiToAmount(
+              Math.abs(netSent).toString(),
+            ).toString();
           } else if (hasIncomingOutput) {
             // Pure incoming transaction (no outgoing inputs)
             type = 'received';
-            amount = HoosatUtils.sompiToAmount(totalReceived.toString()).toString();
+            amount = HoosatUtils.sompiToAmount(
+              totalReceived.toString(),
+            ).toString();
           }
 
           if (amount !== '0') {
             transactions.push({
               txid: tx.transaction_id,
-              amount: amount,
-              type: type,
-              timestamp: tx.block_time ? new Date(tx.block_time).getTime() : Date.now(),
+              amount,
+              type,
+              timestamp: tx.block_time
+                ? new Date(tx.block_time).getTime()
+                : Date.now(),
             });
           }
         }
@@ -94,12 +116,11 @@ export async function getAllTransactions(address?: string, limit = 50): Promise<
     transactions.sort((a, b) => b.timestamp - a.timestamp);
 
     return {
-      transactions: transactions
+      transactions,
     };
-
-  } catch (error) {
+  } catch {
     return {
-      transactions: []
+      transactions: [],
     };
   }
 }

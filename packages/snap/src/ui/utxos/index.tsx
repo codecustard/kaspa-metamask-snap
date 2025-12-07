@@ -1,22 +1,21 @@
+import { Box, Container, Heading, Button, Icon } from '@metamask/snaps-sdk/jsx';
 
-import {
-  Box,
-  Container,
-  Heading,
-  Button,
-  Icon,
-} from '@metamask/snaps-sdk/jsx';
+import { utxoList } from '../components/UTXOList';
 
-import { UTXOList } from '../components/UTXOList';
-
-interface UTXOsPageProps {
+type UTXOsPageProps = {
   utxos: any[];
   address: string;
   [key: string]: any;
-}
+};
 
+/**
+ * Display UTXOs page interface
+ *
+ * @param props - UTXO page component properties
+ * @returns JSX element for UTXOs page
+ */
 export function utxosPage(props: UTXOsPageProps) {
-  const { utxos, address } = props;
+  const { utxos } = props;
 
   const shouldShowCompound = utxos && utxos.length > 1;
 
@@ -44,7 +43,7 @@ export function utxosPage(props: UTXOsPageProps) {
           </Box>
         </Box>
 
-        <UTXOList utxos={utxos} />
+        {utxoList({ utxos })}
       </Box>
     </Container>
   );

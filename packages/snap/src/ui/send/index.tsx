@@ -1,4 +1,3 @@
-
 import {
   Box,
   Container,
@@ -9,6 +8,11 @@ import {
   Divider,
 } from '@metamask/snaps-sdk/jsx';
 
+/**
+ * Display send transaction form interface
+ *
+ * @param id - Interface ID for the snap
+ */
 export async function send(id: string) {
   await snap.request({
     method: 'snap_updateInterface',

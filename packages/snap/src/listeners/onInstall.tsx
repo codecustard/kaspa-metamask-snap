@@ -1,4 +1,3 @@
-
 import type { OnInstallHandler } from '@metamask/snaps-sdk';
 import { Box, Heading, Text } from '@metamask/snaps-sdk/jsx';
 

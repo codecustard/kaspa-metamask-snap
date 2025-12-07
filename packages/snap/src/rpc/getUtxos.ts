@@ -1,8 +1,8 @@
-
-import { getWallet } from '../util/wallet';
 import { HoosatUtils } from 'hoosat-sdk-web';
 
-export interface UTXO {
+import { getWallet } from '../util/wallet';
+
+export type UTXO = {
   outpoint: {
     transactionId: string;
     index: number;
@@ -13,10 +13,13 @@ export interface UTXO {
   blockDaaScore?: number;
   isCoinbase?: boolean;
   [key: string]: any;
-}
+};
 
 /**
  * Get UTXOs for an address from Hoosat network
+ *
+ * @param address - Wallet address to fetch UTXOs for
+ * @returns Promise that resolves to UTXOs list
  */
 export async function getUtxos(address?: string): Promise<{ utxos: UTXO[] }> {
   try {
@@ -28,11 +31,14 @@ export async function getUtxos(address?: string): Promise<{ utxos: UTXO[] }> {
     }
 
     // Fetch UTXOs using the Hoosat API
-    const utxosResponse = await fetch(`https://proxy.hoosat.net/api/v1/address/utxos`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ addresses: [walletAddress] })
-    });
+    const utxosResponse = await fetch(
+      `https://proxy.hoosat.net/api/v1/address/utxos`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addresses: [walletAddress] }),
+      },
+    );
 
     if (!utxosResponse.ok) {
       console.error('Failed to fetch UTXOs:', utxosResponse.statusText);
@@ -72,7 +78,6 @@ export async function getUtxos(address?: string): Promise<{ utxos: UTXO[] }> {
     utxos.sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
 
     return { utxos };
-
   } catch (error) {
     console.error('Error fetching UTXOs:', error);
     return { utxos: [] };

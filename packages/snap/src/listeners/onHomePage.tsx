@@ -1,11 +1,10 @@
-
 import type { OnHomePageHandler } from '@metamask/snaps-sdk';
-
 import { HoosatUtils } from 'hoosat-sdk-web';
+
+import { getTransactions } from '../rpc/getTransactions';
+import { home } from '../ui/home';
 import { client } from '../util/client';
 import { getWallet } from '../util/wallet';
-import { home } from '../ui/home';
-import { getTransactions } from '../rpc/getTransactions';
 
 export const onHomePage: OnHomePageHandler = async () => {
   let balance = '0.00000000';
@@ -18,7 +17,7 @@ export const onHomePage: OnHomePageHandler = async () => {
     try {
       const balanceResult = await client.getBalance(address);
 
-      if (balanceResult && typeof balanceResult.balance !== 'undefined') {
+      if (typeof balanceResult?.balance !== 'undefined') {
         const balanceAmount = HoosatUtils.sompiToAmount(balanceResult.balance);
         balance = balanceAmount.toString();
       }

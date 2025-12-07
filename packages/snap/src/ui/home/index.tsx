@@ -1,4 +1,3 @@
-
 import {
   Box,
   Container,
@@ -13,7 +12,7 @@ import { TotalBalance } from './partials/TotalBalance';
 import { CTA } from '../components/CTA';
 import { TransactionHistory } from '../components/TransactionHistory';
 
-interface HomeProps {
+type HomeProps = {
   balance: string;
   address: string;
   hideBalance?: boolean;
@@ -22,10 +21,23 @@ interface HomeProps {
   shouldSuggestCompound?: boolean;
   utxoCount?: number;
   [key: string]: any;
-}
+};
 
+/**
+ * Display home page interface
+ *
+ * @param props - Home component properties
+ * @returns JSX element for home page
+ */
 export function home(props: HomeProps) {
-  const { balance, address, hideBalance = false, transactions = [], debugMessage, shouldSuggestCompound = false, utxoCount = 0 } = props;
+  const {
+    balance,
+    address,
+    hideBalance = false,
+    transactions = [],
+    shouldSuggestCompound = false,
+    utxoCount = 0,
+  } = props;
 
   return (
     <Container>
@@ -39,7 +51,7 @@ export function home(props: HomeProps) {
         {/* <Box direction="vertical" alignment="center">
           <Heading size="md">Address</Heading>
         </Box> */}
-{hideBalance ? (
+        {hideBalance ? (
           <Text color="alternative">
             ●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
           </Text>

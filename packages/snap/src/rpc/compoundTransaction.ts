@@ -1,31 +1,34 @@
 import { HoosatTxBuilder, HoosatUtils } from 'hoosat-sdk-web';
+
 import { client } from '../util/client';
 import { getWallet } from '../util/wallet';
 
-export interface CompoundTransactionResult {
+export type CompoundTransactionResult = {
   success: boolean;
   txId?: string;
   error?: string;
   utxosConsolidated?: number;
   totalAmount?: string;
   [key: string]: any;
-}
+};
 
 /**
  * Compound/consolidate UTXOs by sending all available UTXOs to yourself
  * This creates fewer, larger UTXOs which reduces transaction complexity
+ *
+ * @returns Promise that resolves to compound transaction result
  */
 export async function compoundTransaction(): Promise<CompoundTransactionResult> {
   try {
     const wallet = await getWallet();
 
     // Get fresh UTXOs (wait a moment to ensure we have the latest state)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const utxos = await client.getUtxos([wallet.address]);
 
     console.log('Compound - UTXO response:', utxos);
 
-    if (!utxos || !utxos.utxos || utxos.utxos.length === 0) {
+    if (!utxos?.utxos || utxos.utxos.length === 0) {
       return {
         success: false,
         error: 'No UTXOs available to compound',
@@ -44,17 +47,20 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
 
     // Calculate total available amount
     let totalAmount = 0;
-    utxos.utxos.forEach(utxo => {
-      totalAmount += parseInt(utxo.utxoEntry?.amount || '0');
+    utxos.utxos.forEach((utxo) => {
+      totalAmount += parseInt(utxo.utxoEntry?.amount || '0', 10);
     });
 
-    console.log(`Compounding ${utxos.utxos.length} UTXOs with total amount: ${totalAmount} sompi`);
+    console.log(
+      `Compounding ${utxos.utxos.length} UTXOs with total amount: ${totalAmount} sompi`,
+    );
 
     // Build transaction using Hoosat SDK
     const builder = new HoosatTxBuilder();
 
     // Add all UTXOs as inputs
-    utxos.utxos.forEach(utxo => {
+    utxos.utxos.forEach((utxo) => {
+      // eslint-disable-next-line no-restricted-globals
       const privateKeyBuffer = Buffer.from(wallet.privateKey, 'hex');
       builder.addInput(utxo, privateKeyBuffer);
     });
@@ -65,7 +71,7 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
 
     // Add single output back to yourself (minus fees)
     // This will consolidate all UTXOs into one
-    const outputAmount = totalAmount - parseInt(totalFee);
+    const outputAmount = totalAmount - parseInt(totalFee, 10);
 
     if (outputAmount <= 0) {
       return {
@@ -75,9 +81,7 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
       };
     }
 
-    builder
-      .addOutput(wallet.address, outputAmount.toString())
-      .setFee(totalFee);
+    builder.addOutput(wallet.address, outputAmount.toString()).setFee(totalFee);
 
     // Sign the transaction
     const signedTx = builder.sign();
@@ -87,7 +91,7 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
     const result = await client.submitTransaction(signedTx);
     console.log('Compound - submit result:', result);
 
-    if (result && result.transactionId) {
+    if (result?.transactionId) {
       const totalAmountHTN = HoosatUtils.sompiToAmount(totalAmount.toString());
       return {
         success: true,
@@ -95,25 +99,27 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
         utxosConsolidated: utxos.utxos.length,
         totalAmount: totalAmountHTN.toString(),
       };
-    } else {
-      return {
-        success: false,
-        error: `Compound transaction submit failed: ${JSON.stringify(result)}`,
-        utxosConsolidated: utxos.utxos.length,
-      };
     }
+    return {
+      success: false,
+      error: `Compound transaction submit failed: ${JSON.stringify(result)}`,
+      utxosConsolidated: utxos.utxos.length,
+    };
   } catch (error) {
     console.error('Compound transaction error:', error);
 
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     // Check for common error patterns
-    if (errorMessage.toLowerCase().includes('spent') ||
-        errorMessage.toLowerCase().includes('missing') ||
-        errorMessage.toLowerCase().includes('not found')) {
+    if (
+      errorMessage.toLowerCase().includes('spent') ||
+      errorMessage.toLowerCase().includes('missing') ||
+      errorMessage.toLowerCase().includes('not found')
+    ) {
       return {
         success: false,
-        error: 'UTXOs already spent or unavailable. Please refresh your UTXOs and try again.',
+        error:
+          'UTXOs already spent or unavailable. Please refresh your UTXOs and try again.',
         utxosConsolidated: 0,
       };
     }
@@ -124,7 +130,7 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
       const debugWallet = await getWallet();
       const debugUtxos = await client.getUtxos([debugWallet.address]);
       debugInfo = ` Current UTXO Count: ${debugUtxos?.utxos?.length || 0}`;
-    } catch (debugError) {
+    } catch {
       debugInfo = ' (Debug fetch failed)';
     }
 
@@ -139,8 +145,13 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
 /**
  * Check if wallet should suggest compounding
  * Returns true if UTXO count is high enough to warrant consolidation
+ *
+ * @returns Promise that resolves to suggestion result with UTXO count
  */
-export async function shouldSuggestCompound(): Promise<{ suggest: boolean; utxoCount: number }> {
+export async function shouldSuggestCompound(): Promise<{
+  suggest: boolean;
+  utxoCount: number;
+}> {
   try {
     const wallet = await getWallet();
     const utxos = await client.getUtxos([wallet.address]);

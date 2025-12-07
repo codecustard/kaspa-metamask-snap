@@ -1,16 +1,14 @@
+import { Box, Container, Heading, Text, Button } from '@metamask/snaps-sdk/jsx';
 
-import {
-  Box,
-  Container,
-  Heading,
-  Text,
-  Button,
-} from '@metamask/snaps-sdk/jsx';
-
-import { getWallet } from '../util/wallet';
+import { utxosPage } from './utxos/';
 import { getUtxos } from '../rpc/getUtxos';
-import { utxosPage } from './utxos/index';
+import { getWallet } from '../util/wallet';
 
+/**
+ * Display UTXOs view interface
+ *
+ * @param id - Interface ID for the snap
+ */
 export async function viewUTXOs(id: string) {
   let step = 'Starting';
   try {
@@ -42,7 +40,7 @@ export async function viewUTXOs(id: string) {
 
     if (error instanceof Error) {
       errorMessage = error.message;
-      errorStack = error.stack?.substring(0, 200) || 'N/A';
+      errorStack = error.stack?.substring(0, 200) ?? 'N/A';
     } else {
       try {
         errorMessage = JSON.stringify(error);

@@ -1,4 +1,3 @@
-
 import {
   Box,
   Container,
@@ -9,11 +8,19 @@ import {
   Divider,
 } from '@metamask/snaps-sdk/jsx';
 
+/**
+ * Display transaction review before confirmation
+ *
+ * @param id - Interface ID for the snap
+ * @param recipient - Recipient address for the transaction
+ * @param amount - Amount to send
+ * @param senderAddress - Sender address for the transaction
+ */
 export async function reviewSend(
   id: string,
   recipient: string,
   amount: string,
-  senderAddress: string
+  senderAddress: string,
 ) {
   await snap.request({
     method: 'snap_updateInterface',

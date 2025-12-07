@@ -1,4 +1,3 @@
-
 import type { OnUserInputHandler } from '@metamask/snaps-sdk';
 import { UserInputEventType } from '@metamask/snaps-sdk';
 import {
@@ -9,15 +8,34 @@ import {
   Button,
   Copyable,
 } from '@metamask/snaps-sdk/jsx';
-import { send, receive, reviewSend, confirmSend, home, viewUTXOs, transactionDetails, allTransactions } from '../ui';
-import { getWallet } from '../util/wallet';
-import { getTransactions } from '../rpc/getTransactions';
+import { HoosatUtils } from 'hoosat-sdk-web';
+
+import {
+  compoundTransaction,
+  shouldSuggestCompound,
+} from '../rpc/compoundTransaction';
 import { getAllTransactions } from '../rpc/getAllTransactions';
 import { getTransactionDetails } from '../rpc/getTransactionDetails';
-import { compoundTransaction, shouldSuggestCompound } from '../rpc/compoundTransaction';
-import { HoosatUtils } from 'hoosat-sdk-web';
+import { getTransactions } from '../rpc/getTransactions';
+import {
+  send,
+  receive,
+  reviewSend,
+  confirmSend,
+  home,
+  viewUTXOs,
+  transactionDetails,
+  allTransactions,
+} from '../ui';
 import { client } from '../util/client';
+import { getWallet } from '../util/wallet';
 
+/**
+ * Refresh home page with updated balance and data
+ *
+ * @param id - Interface ID for the snap
+ * @param hideBalance - Whether to hide balance in the UI
+ */
 async function refreshHomePage(id: string, hideBalance = false) {
   let balance = '0.00000000';
   let address = 'hoosat:qr1234567890abcdef1234567890abcdef12345678';
@@ -29,7 +47,7 @@ async function refreshHomePage(id: string, hideBalance = false) {
     try {
       const balanceResult = await client.getBalance(address);
 
-      if (balanceResult && typeof balanceResult.balance !== 'undefined') {
+      if (typeof balanceResult?.balance !== 'undefined') {
         const balanceAmount = HoosatUtils.sompiToAmount(balanceResult.balance);
         balance = balanceAmount.toString();
       }
@@ -63,11 +81,22 @@ async function refreshHomePage(id: string, hideBalance = false) {
   });
 }
 
-export const onUserInput: OnUserInputHandler = async ({ id, event, context }) => {
-  console.log('onUserInput called with event:', event.name, 'type:', event.type);
+export const onUserInput: OnUserInputHandler = async ({
+  id,
+  event,
+  context,
+}) => {
+  console.log(
+    'onUserInput called with event:',
+    event.name,
+    'type:',
+    event.type,
+  );
 
-  if (event.type === UserInputEventType.ButtonClickEvent || event.type === UserInputEventType.InputChangeEvent) {
-
+  if (
+    event.type === UserInputEventType.ButtonClickEvent ||
+    event.type === UserInputEventType.InputChangeEvent
+  ) {
     // Get form state from interface
     const state = await snap.request({
       method: 'snap_getInterfaceState',
@@ -83,30 +112,28 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
         await receive(id);
         break;
 
-      case 'sendReview':
-        {
-          const recipient = state.recipient as string;
-          const amount = state.amount as string;
+      case 'sendReview': {
+        const recipient = state.recipient as string;
+        const amount = state.amount as string;
 
-          if (!recipient || !amount) {
-            // Stay on send page if form is incomplete
-            await send(id);
-            break;
-          }
-
-          const wallet = await getWallet();
-          await reviewSend(id, recipient, amount, wallet.address);
+        if (!recipient || !amount) {
+          // Stay on send page if form is incomplete
+          await send(id);
           break;
         }
 
-      case 'sendConfirm':
-        {
-          const recipient = (context?.recipient || state.recipient) as string;
-          const amount = (context?.amount || state.amount) as string;
+        const wallet = await getWallet();
+        await reviewSend(id, recipient, amount, wallet.address);
+        break;
+      }
 
-          await confirmSend(id, recipient, amount);
-          break;
-        }
+      case 'sendConfirm': {
+        const recipient = (context?.recipient ?? state.recipient) as string;
+        const amount = (context?.amount ?? state.amount) as string;
+
+        await confirmSend(id, recipient, amount);
+        break;
+      }
 
       case 'backToHome':
       case 'refreshBalances':
@@ -120,7 +147,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
         await refreshHomePage(id, event.name === 'hideBalance');
         break;
 
-      case 'viewAllTransactions':
+      case 'viewAllTransactions': {
         // Show full transaction history screen
         const allTransactionHistory = await getAllTransactions();
         await snap.request({
@@ -138,6 +165,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
           },
         });
         break;
+      }
 
       case 'viewUTXOs':
         await viewUTXOs(id);
@@ -163,23 +191,26 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                     <Box>
                       <Heading>Compound Successful</Heading>
                       <Text color="success">
-                        Successfully consolidated {compoundResult.utxosConsolidated?.toString() || '0'} UTXOs
+                        Successfully consolidated{' '}
+                        {compoundResult.utxosConsolidated?.toString() ?? '0'}{' '}
+                        UTXOs
                       </Text>
                       <Text color="alternative">
-                        Total Amount: {compoundResult.totalAmount || '0'} HTN
+                        Total Amount: {compoundResult.totalAmount ?? '0'} HTN
                       </Text>
-                      <Text color="alternative">
-                        Transaction ID:
-                      </Text>
-                      <Copyable value={compoundResult.txId || 'N/A'} />
-                      <Text color="alternative">
-                        Explorer Link:
-                      </Text>
-                      <Copyable value={`https://explorer.hoosat.fi/txs/${compoundResult.txId || ''}`} />
+                      <Text color="alternative">Transaction ID:</Text>
+                      <Copyable value={compoundResult.txId ?? 'N/A'} />
+                      <Text color="alternative">Explorer Link:</Text>
+                      <Copyable
+                        value={`https://explorer.hoosat.fi/txs/${compoundResult.txId ?? ''}`}
+                      />
                       <Text color="muted">
-                        Note: It may take a few moments for the blockchain to update
+                        Note: It may take a few moments for the blockchain to
+                        update
                       </Text>
-                      <Button name="refreshAndViewUTXOs" variant="primary">Refresh UTXOs</Button>
+                      <Button name="refreshAndViewUTXOs" variant="primary">
+                        Refresh UTXOs
+                      </Button>
                       <Button name="backToHome">Home</Button>
                     </Box>
                   </Container>
@@ -196,14 +227,17 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                     <Box>
                       <Heading>Compound Failed</Heading>
                       <Text color="error">
-                        {compoundResult.error || 'Unknown error occurred'}
+                        {compoundResult.error ?? 'Unknown error occurred'}
                       </Text>
                       {compoundResult.error?.includes('already spent') ? (
                         <Text color="alternative">
-                          This usually means a previous compound was successful but the UI needs to refresh.
+                          This usually means a previous compound was successful
+                          but the UI needs to refresh.
                         </Text>
                       ) : null}
-                      <Button name="refreshAndViewUTXOs" variant="primary">Refresh UTXOs</Button>
+                      <Button name="refreshAndViewUTXOs" variant="primary">
+                        Refresh UTXOs
+                      </Button>
                       <Button name="backToHome">Home</Button>
                     </Box>
                   </Container>
@@ -221,9 +255,12 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                   <Box>
                     <Heading>Compound Error</Heading>
                     <Text color="error">
-                      Failed to compound UTXOs: {error instanceof Error ? error.message : String(error)}
+                      Failed to compound UTXOs:{' '}
+                      {error instanceof Error ? error.message : String(error)}
                     </Text>
-                    <Button name="viewUTXOs" variant="primary">Back to UTXOs</Button>
+                    <Button name="viewUTXOs" variant="primary">
+                      Back to UTXOs
+                    </Button>
                     <Button name="backToHome">Home</Button>
                   </Box>
                 </Container>
@@ -241,11 +278,13 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
       case 'nextPage':
       case 'previousPage':
       case 'firstPage':
-      case 'lastPage':
+      case 'lastPage': {
         // Handle pagination for transaction history
-        const currentPageFromContext = (context?.currentPage || 1) as number;
+        const currentPageFromContext = (context?.currentPage ?? 1) as number;
         const paginatedTransactionHistory = await getAllTransactions();
-        const totalPages = Math.ceil(paginatedTransactionHistory.transactions.length / 10);
+        const totalPages = Math.ceil(
+          paginatedTransactionHistory.transactions.length / 10,
+        );
 
         let newPage: number;
         switch (event.name) {
@@ -275,18 +314,24 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
             }),
             context: {
               currentPage: newPage,
-              totalTransactions: paginatedTransactionHistory.transactions.length,
+              totalTransactions:
+                paginatedTransactionHistory.transactions.length,
             },
           },
         });
         break;
+      }
 
       case 'showDebug':
       case 'hideDebug':
         // Get the current transaction ID from context or state
-        if (context && context.transactionId) {
+        if (context?.transactionId) {
           const wallet = await getWallet();
-          const transactionDetail = await getTransactionDetails(String(context.transactionId));
+          const transactionDetail = await getTransactionDetails(
+            typeof context.transactionId === 'string'
+              ? context.transactionId
+              : '',
+          );
 
           if (transactionDetail) {
             await snap.request({
@@ -296,12 +341,15 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                 ui: transactionDetails({
                   transaction: transactionDetail,
                   userAddress: wallet.address,
-                  showDebug: event.name === 'showDebug'
+                  showDebug: event.name === 'showDebug',
                 }),
                 // Preserve the transaction context so subsequent debug
                 // toggles continue to have access to the transactionId.
                 context: {
-                  transactionId: String(context.transactionId),
+                  transactionId:
+                    typeof context.transactionId === 'string'
+                      ? context.transactionId
+                      : '',
                 },
               },
             });
@@ -312,6 +360,10 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
       case 'settings':
         // TODO: Implement these features
         console.log(`${event.name} clicked - not yet implemented`);
+        break;
+
+      case undefined:
+        console.warn('Event name is undefined');
         break;
 
       default:
@@ -344,11 +396,13 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                     <Copyable value={addressExplorerUrl} />
 
                     <Text>TX ID:</Text>
-                    <Copyable value={txId || 'Unknown'} />
+                    <Copyable value={txId ?? 'Unknown'} />
 
-                    <Text>Index: {index || 'Unknown'}</Text>
+                    <Text>Index: {index ?? 'Unknown'}</Text>
 
-                    <Button name="goBack" variant="primary">Go Back</Button>
+                    <Button name="goBack" variant="primary">
+                      Go Back
+                    </Button>
                   </Box>
                 </Container>
               ),
@@ -372,11 +426,11 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                 ui: transactionDetails({
                   transaction: transactionDetail,
                   userAddress: wallet.address,
-                  showDebug: false
+                  showDebug: false,
                 }),
                 context: {
-                  transactionId: txId
-                }
+                  transactionId: txId,
+                },
               },
             });
           } else {
@@ -392,7 +446,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
                       <Text color="error">
                         Failed to load transaction details
                       </Text>
-                      <Button name="goBack" variant="primary">Go Back</Button>
+                      <Button name="goBack" variant="primary">
+                        Go Back
+                      </Button>
                     </Box>
                   </Container>
                 ),
@@ -402,7 +458,11 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
           break;
         }
 
-        console.warn('Unknown event:', event.name, 'Available events: send, receive, sendReview, sendConfirm, backToHome, refreshBalances, hideBalance, showBalance, viewAllTransactions, viewUTXOs, refreshUTXOs, goBack, copyAddress, settings');
+        console.warn(
+          'Unknown event:',
+          event.name,
+          'Available events: send, receive, sendReview, sendConfirm, backToHome, refreshBalances, hideBalance, showBalance, viewAllTransactions, viewUTXOs, refreshUTXOs, goBack, copyAddress, settings',
+        );
         break;
     }
   }

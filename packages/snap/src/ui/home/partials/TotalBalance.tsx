@@ -1,20 +1,16 @@
+import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import { Box, Heading, Button, Icon } from '@metamask/snaps-sdk/jsx';
 
-import {
-  Box,
-  Heading,
-  Text,
-  Button,
-  Icon,
-  SnapComponent,
-} from '@metamask/snaps-sdk/jsx';
-
-interface Props {
+type Props = {
   balance: string;
   hideBalance?: boolean;
   [key: string]: any;
-}
+};
 
-export const TotalBalance: SnapComponent<Props> = ({ balance, hideBalance }) => {
+export const TotalBalance: SnapComponent<Props> = ({
+  balance,
+  hideBalance,
+}) => {
   const balanceNumber = parseFloat(balance);
   const formattedBalance = balanceNumber.toLocaleString('en-US', {
     minimumFractionDigits: 2,

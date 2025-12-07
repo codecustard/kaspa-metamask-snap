@@ -1,8 +1,12 @@
-
 /**
  * Clear wallet state
+ *
+ * @returns Promise that resolves to success result
  */
-export async function clearWallet(): Promise<{ success: boolean; message: string }> {
+export async function clearWallet(): Promise<{
+  success: boolean;
+  message: string;
+}> {
   await snap.request({
     method: 'snap_manageState',
     params: { operation: 'clear' },

@@ -1,4 +1,3 @@
-
 export * from './getBalance';
 export * from './sendTransaction';
 export * from './generateAddress';

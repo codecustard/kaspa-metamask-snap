@@ -1,4 +1,3 @@
-
 import {
   Box,
   Container,
@@ -11,6 +10,11 @@ import {
 
 import { getWallet } from '../../util/wallet';
 
+/**
+ * Display receive address interface
+ *
+ * @param id - Interface ID for the snap
+ */
 export async function receive(id: string) {
   let address = 'hoosat:qr1234567890abcdef1234567890abcdef12345678';
 

@@ -1,39 +1,44 @@
-
 import { HoosatUtils } from 'hoosat-sdk-web';
+
 import { client } from '../util/client';
 import { getWallet } from '../util/wallet';
 
-export interface BalanceResult {
+export type BalanceResult = {
   balance: string;
   confirmed: string;
   unconfirmed: string;
   [key: string]: any;
-}
+};
 
-export interface DebugBalanceResult {
+export type DebugBalanceResult = {
   address: string;
   rawBalance: string;
   isRealAddress: boolean;
   [key: string]: any;
-}
+};
 
 /**
  * Get balance for an address
+ *
+ * @param address - Wallet address to get balance for
+ * @returns Promise that resolves to balance result
  */
 export async function getBalance(address?: string): Promise<BalanceResult> {
   try {
     const wallet = await getWallet();
-    const targetAddress = address || wallet.address;
+    const targetAddress = address ?? wallet.address;
 
     const balanceResult = await client.getBalance(targetAddress);
-    const confirmedBalance = HoosatUtils.sompiToAmount(balanceResult.balance || '0');
+    const confirmedBalance = HoosatUtils.sompiToAmount(
+      balanceResult.balance || '0',
+    );
 
     return {
       balance: confirmedBalance.toString(),
       confirmed: confirmedBalance.toString(),
       unconfirmed: '0.00000000',
     };
-  } catch (error) {
+  } catch {
     return {
       balance: '0.00000000',
       confirmed: '0.00000000',
@@ -44,8 +49,12 @@ export async function getBalance(address?: string): Promise<BalanceResult> {
 
 /**
  * Debug balance call for troubleshooting
+ *
+ * @returns Promise that resolves to debug balance result or error
  */
-export async function debugBalance(): Promise<DebugBalanceResult | { error: string }> {
+export async function debugBalance(): Promise<
+  DebugBalanceResult | { error: string }
+> {
   try {
     const wallet = await getWallet();
     console.log('Debug wallet:', wallet);
@@ -56,7 +65,9 @@ export async function debugBalance(): Promise<DebugBalanceResult | { error: stri
     return {
       address: wallet.address,
       rawBalance: JSON.stringify(balanceResult),
-      isRealAddress: wallet.address.startsWith('hoosat:') && !wallet.address.includes('qr1234'),
+      isRealAddress:
+        wallet.address.startsWith('hoosat:') &&
+        !wallet.address.includes('qr1234'),
     };
   } catch (error) {
     console.error('Debug balance error:', error);

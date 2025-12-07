@@ -1,4 +1,3 @@
-
 import {
   Box,
   Container,
@@ -12,10 +11,17 @@ import {
 
 import { sendTransaction } from '../../rpc/sendTransaction';
 
+/**
+ * Confirm and execute transaction send
+ *
+ * @param id - Interface ID for the snap
+ * @param recipient - Recipient address for the transaction
+ * @param amount - Amount to send
+ */
 export async function confirmSend(
   id: string,
   recipient: string,
-  amount: string
+  amount: string,
 ) {
   try {
     const result = await sendTransaction({ to: recipient, amount });
@@ -29,14 +35,17 @@ export async function confirmSend(
             <Container>
               <Box>
                 <Heading>Transaction Sent!</Heading>
-                <Text>Your transaction has been successfully submitted to the network.</Text>
+                <Text>
+                  Your transaction has been successfully submitted to the
+                  network.
+                </Text>
 
                 <Divider />
 
                 <Text>
                   <Bold>Transaction ID:</Bold>
                 </Text>
-                <Copyable value={result.txId || 'N/A'} />
+                <Copyable value={result.txId ?? 'N/A'} />
 
                 <Divider />
 
@@ -72,7 +81,7 @@ export async function confirmSend(
                 <Text>
                   <Bold>Error:</Bold>
                 </Text>
-                <Text>{result.error || 'Unknown error'}</Text>
+                <Text>{result.error ?? 'Unknown error'}</Text>
 
                 <Divider />
 
@@ -93,14 +102,18 @@ export async function confirmSend(
           <Container>
             <Box>
               <Heading>Transaction Error</Heading>
-              <Text>An unexpected error occurred while processing the transaction.</Text>
+              <Text>
+                An unexpected error occurred while processing the transaction.
+              </Text>
 
               <Divider />
 
               <Text>
                 <Bold>Error:</Bold>
               </Text>
-              <Text>{error instanceof Error ? error.message : 'Unknown error'}</Text>
+              <Text>
+                {error instanceof Error ? error.message : 'Unknown error'}
+              </Text>
 
               <Divider />
 

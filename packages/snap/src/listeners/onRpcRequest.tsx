@@ -1,4 +1,3 @@
-
 import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
 
 import {
@@ -12,9 +11,7 @@ import {
   clearWallet,
 } from '../rpc';
 
-export const onRpcRequest: OnRpcRequestHandler = async ({
-  request,
-}) => {
+export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
   const params = request.params as any;
 
   switch (request.method) {

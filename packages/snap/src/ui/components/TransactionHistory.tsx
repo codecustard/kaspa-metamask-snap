@@ -1,24 +1,17 @@
+import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import { Box, Text, Bold, Divider, Button } from '@metamask/snaps-sdk/jsx';
 
-import {
-  Box,
-  Text,
-  Bold,
-  Divider,
-  Button,
-  SnapComponent,
-} from '@metamask/snaps-sdk/jsx';
-
-interface Transaction {
+type Transaction = {
   txid: string;
   amount: string;
   type: 'received' | 'sent';
   timestamp: number;
-}
+};
 
-interface Props {
+type Props = {
   transactions: Transaction[];
   [key: string]: any;
-}
+};
 
 export const TransactionHistory: SnapComponent<Props> = ({ transactions }) => {
   if (!transactions || transactions.length === 0) {
@@ -38,7 +31,10 @@ export const TransactionHistory: SnapComponent<Props> = ({ transactions }) => {
   const txsToShow = transactions.slice(0, 4);
 
   for (let i = 0; i < txsToShow.length; i++) {
-    const tx = txsToShow[i]!;
+    const tx = txsToShow[i];
+    if (!tx) {
+      continue;
+    }
 
     txElements.push(
       <Box key={`tx-${i}`} direction="horizontal" alignment="space-between">
@@ -63,7 +59,7 @@ export const TransactionHistory: SnapComponent<Props> = ({ transactions }) => {
             {tx.txid.slice(0, 12)}...
           </Button>
         </Box>
-      </Box>
+      </Box>,
     );
 
     if (i < txsToShow.length - 1) {
@@ -71,9 +67,5 @@ export const TransactionHistory: SnapComponent<Props> = ({ transactions }) => {
     }
   }
 
-  return (
-    <Box direction="vertical">
-      {txElements}
-    </Box>
-  );
+  return <Box direction="vertical">{txElements}</Box>;
 };

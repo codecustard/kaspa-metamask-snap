@@ -1,19 +1,20 @@
-
 import { HoosatCrypto } from 'hoosat-sdk-web';
 
-export interface WalletState {
+export type WalletState = {
   address: string;
   privateKey: string;
-}
+};
 
 /**
  * Get or create wallet from snap state
+ *
+ * @returns Promise that resolves to wallet state
  */
 export async function getWallet(): Promise<WalletState> {
-  const state = await snap.request({
+  const state = (await snap.request({
     method: 'snap_manageState',
     params: { operation: 'get' },
-  }) as { wallet?: WalletState } | null;
+  })) as { wallet?: WalletState } | null;
 
   if (state?.wallet) {
     return state.wallet;

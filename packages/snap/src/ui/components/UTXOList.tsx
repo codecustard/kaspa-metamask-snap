@@ -1,12 +1,6 @@
+import { Box, Text, Heading, Button } from '@metamask/snaps-sdk/jsx';
 
-import {
-  Box,
-  Text,
-  Heading,
-  Button,
-} from '@metamask/snaps-sdk/jsx';
-
-interface UTXO {
+type UTXO = {
   outpoint: {
     transactionId: string;
     index: number;
@@ -16,14 +10,20 @@ interface UTXO {
   blockDaaScore?: number;
   isCoinbase?: boolean;
   [key: string]: any;
-}
+};
 
-interface UTXOListProps {
+type UTXOListProps = {
   utxos: UTXO[];
   [key: string]: any;
-}
+};
 
-export function UTXOList(props: UTXOListProps) {
+/**
+ * Display list of UTXOs
+ *
+ * @param props - UTXO list component properties
+ * @returns JSX element for UTXO list display
+ */
+export function utxoList(props: UTXOListProps) {
   const { utxos } = props;
 
   if (!utxos || utxos.length === 0) {
@@ -43,11 +43,15 @@ export function UTXOList(props: UTXOListProps) {
         const formattedAmount = amount === 0 ? '0.00000000' : amount.toFixed(8);
 
         return (
-        <Box key={`utxo-${index}`} direction="vertical">
-          <Button name={`viewUTXO:${utxo.outpoint.transactionId}:${utxo.outpoint.index}:${utxo.scriptPublicKeyAddress}`} variant="primary">
-            {formattedAmount} HTN - {utxo.scriptPublicKeyAddress.substring(0, 30)}...
-          </Button>
-        </Box>
+          <Box key={`utxo-${index}`} direction="vertical">
+            <Button
+              name={`viewUTXO:${utxo.outpoint.transactionId}:${utxo.outpoint.index}:${utxo.scriptPublicKeyAddress}`}
+              variant="primary"
+            >
+              {formattedAmount} HTN -{' '}
+              {utxo.scriptPublicKeyAddress.substring(0, 30)}...
+            </Button>
+          </Box>
         );
       })}
 

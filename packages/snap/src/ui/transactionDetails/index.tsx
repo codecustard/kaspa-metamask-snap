@@ -9,25 +9,38 @@ import {
   Copyable,
 } from '@metamask/snaps-sdk/jsx';
 
-interface TransactionDetailsProps {
+type TransactionDetailsProps = {
   transaction: {
-    transaction_id: string;
-    block_time?: string;
-    is_accepted?: boolean;
-    inputs?: Array<{
-      previous_outpoint_address?: string;
-      previous_outpoint_amount?: string;
-    }>;
-    outputs?: Array<{
-      script_public_key_address?: string;
+    transactionId: string;
+    blockTime?: string;
+    isAccepted?: boolean;
+    inputs?: {
+      previousOutpointAddress?: string;
+      previousOutpointAmount?: string;
+    }[];
+    outputs?: {
+      scriptPublicKeyAddress?: string;
       amount?: string;
-    }>;
+    }[];
   };
   userAddress: string;
   showDebug?: boolean;
-}
+};
 
-export function transactionDetails({ transaction, userAddress, showDebug = false }: TransactionDetailsProps) {
+/**
+ * Display detailed transaction information
+ *
+ * @param options0 - Component props object
+ * @param options0.transaction - Transaction details to display
+ * @param options0.userAddress - User's wallet address for comparison
+ * @param options0.showDebug - Whether to show debug information
+ * @returns JSX element for transaction details display
+ */
+export function transactionDetails({
+  transaction,
+  userAddress,
+  showDebug = false,
+}: TransactionDetailsProps) {
   // Calculate transaction direction and amounts
   let totalReceived = 0;
   let totalSent = 0;
@@ -37,8 +50,8 @@ export function transactionDetails({ transaction, userAddress, showDebug = false
   // Check outputs for incoming transactions
   if (transaction.outputs && Array.isArray(transaction.outputs)) {
     for (const output of transaction.outputs) {
-      if (output.script_public_key_address === userAddress) {
-        totalReceived += parseInt(output.amount || '0');
+      if (output.scriptPublicKeyAddress === userAddress) {
+        totalReceived += parseInt(output.amount ?? '0', 10);
         hasIncomingOutput = true;
       }
     }
@@ -47,9 +60,9 @@ export function transactionDetails({ transaction, userAddress, showDebug = false
   // Check inputs for outgoing transactions
   if (transaction.inputs && Array.isArray(transaction.inputs)) {
     for (const input of transaction.inputs) {
-      if (input.previous_outpoint_address === userAddress) {
+      if (input.previousOutpointAddress === userAddress) {
         hasOutgoingInput = true;
-        totalSent += parseInt(input.previous_outpoint_amount || '0');
+        totalSent += parseInt(input.previousOutpointAmount ?? '0', 10);
       }
     }
   }
@@ -72,7 +85,9 @@ export function transactionDetails({ transaction, userAddress, showDebug = false
           <Text>
             <Bold>Explorer Link:</Bold>
           </Text>
-          <Copyable value={`https://explorer.hoosat.fi/txs/${transaction.transaction_id}`} />
+          <Copyable
+            value={`https://explorer.hoosat.fi/txs/${transaction.transactionId}`}
+          />
         </Box>
 
         <Divider />
@@ -81,7 +96,7 @@ export function transactionDetails({ transaction, userAddress, showDebug = false
           <Text>
             <Bold>Transaction ID:</Bold>
           </Text>
-          <Copyable value={transaction.transaction_id} />
+          <Copyable value={transaction.transactionId} />
         </Box>
 
         <Box direction="vertical">
@@ -98,9 +113,7 @@ export function transactionDetails({ transaction, userAddress, showDebug = false
             <Text>
               <Bold>Date:</Bold>
             </Text>
-            <Text>
-              {new Date(transaction.block_time).toLocaleString()}
-            </Text>
+            <Text>{new Date(transaction.block_time).toLocaleString()}</Text>
           </Box>
         )}
 
@@ -130,7 +143,8 @@ export function transactionDetails({ transaction, userAddress, showDebug = false
               <Bold>Amount Sent:</Bold>
             </Text>
             <Text color="error">
-              -{Math.abs((totalSent - totalReceived) / 100000000).toFixed(8)} HTN
+              -{Math.abs((totalSent - totalReceived) / 100000000).toFixed(8)}{' '}
+              HTN
             </Text>
           </Box>
         )}
@@ -138,7 +152,10 @@ export function transactionDetails({ transaction, userAddress, showDebug = false
         <Divider />
 
         <Box direction="horizontal" alignment="center">
-          <Button name={showDebug ? 'hideDebug' : 'showDebug'} variant="primary">
+          <Button
+            name={showDebug ? 'hideDebug' : 'showDebug'}
+            variant="primary"
+          >
             {showDebug ? 'Hide Debug Info' : 'Show Debug Info'}
           </Button>
         </Box>
@@ -149,14 +166,18 @@ export function transactionDetails({ transaction, userAddress, showDebug = false
               <Bold>Debug - Input Structure:</Bold>
             </Text>
             <Text color="alternative" size="sm">
-              {JSON.stringify(transaction.inputs?.[0] || 'No inputs', null, 2)}
+              {JSON.stringify(transaction.inputs?.[0] ?? 'No inputs', null, 2)}
             </Text>
 
             <Text>
               <Bold>Debug - Output Structure:</Bold>
             </Text>
             <Text color="alternative" size="sm">
-              {JSON.stringify(transaction.outputs?.[0] || 'No outputs', null, 2)}
+              {JSON.stringify(
+                transaction.outputs?.[0] ?? 'No outputs',
+                null,
+                2,
+              )}
             </Text>
           </Box>
         )}

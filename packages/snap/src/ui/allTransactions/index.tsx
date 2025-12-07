@@ -8,19 +8,27 @@ import {
   Divider,
 } from '@metamask/snaps-sdk/jsx';
 
-interface Transaction {
+type Transaction = {
   txid: string;
   amount: string;
   type: 'received' | 'sent';
   timestamp: number;
-}
+};
 
-interface Props {
+type Props = {
   transactions: Transaction[];
   currentPage?: number;
   [key: string]: any;
-}
+};
 
+/**
+ * Display paginated transaction history
+ *
+ * @param options0 - Component props object
+ * @param options0.transactions - List of transactions to display
+ * @param options0.currentPage - Current page number for pagination
+ * @returns JSX element for transaction history display
+ */
 export function allTransactions({ transactions, currentPage = 1 }: Props) {
   const ITEMS_PER_PAGE = 10;
   const totalPages = Math.ceil(transactions.length / ITEMS_PER_PAGE);
@@ -53,7 +61,9 @@ export function allTransactions({ transactions, currentPage = 1 }: Props) {
           <Box direction="vertical">
             <Box direction="horizontal" alignment="space-between">
               <Text color="alternative">
-                Showing {(startIndex + 1).toString()}-{Math.min(endIndex, transactions.length).toString()} of {transactions.length.toString()} transactions
+                Showing {(startIndex + 1).toString()}-
+                {Math.min(endIndex, transactions.length).toString()} of{' '}
+                {transactions.length.toString()} transactions
               </Text>
               <Text color="alternative">
                 Page {currentPage.toString()} of {totalPages.toString()}
@@ -65,13 +75,17 @@ export function allTransactions({ transactions, currentPage = 1 }: Props) {
                 <Box direction="horizontal" alignment="space-between">
                   <Box direction="horizontal">
                     <Box direction="vertical" alignment="start">
-                      <Text color={tx.type === 'received' ? 'success' : 'error'}>
+                      <Text
+                        color={tx.type === 'received' ? 'success' : 'error'}
+                      >
                         <Bold>
                           {tx.type === 'received' ? '+' : '-'}
                           {parseFloat(tx.amount).toFixed(8)} HTN
                         </Bold>
                       </Text>
-                      <Text color={tx.type === 'received' ? 'success' : 'error'}>
+                      <Text
+                        color={tx.type === 'received' ? 'success' : 'error'}
+                      >
                         {tx.type === 'received' ? 'Received' : 'Sent'}
                       </Text>
                     </Box>
@@ -95,14 +109,14 @@ export function allTransactions({ transactions, currentPage = 1 }: Props) {
                 <Box direction="horizontal" alignment="space-between">
                   <Button
                     name="firstPage"
-                    variant={currentPage > 1 ? "primary" : "destructive"}
+                    variant={currentPage > 1 ? 'primary' : 'destructive'}
                     disabled={currentPage <= 1}
                   >
                     First
                   </Button>
                   <Button
                     name="previousPage"
-                    variant={currentPage > 1 ? "primary" : "destructive"}
+                    variant={currentPage > 1 ? 'primary' : 'destructive'}
                     disabled={currentPage <= 1}
                   >
                     Previous
@@ -112,14 +126,18 @@ export function allTransactions({ transactions, currentPage = 1 }: Props) {
                   </Text>
                   <Button
                     name="nextPage"
-                    variant={currentPage < totalPages ? "primary" : "destructive"}
+                    variant={
+                      currentPage < totalPages ? 'primary' : 'destructive'
+                    }
                     disabled={currentPage >= totalPages}
                   >
                     Next
                   </Button>
                   <Button
                     name="lastPage"
-                    variant={currentPage < totalPages ? "primary" : "destructive"}
+                    variant={
+                      currentPage < totalPages ? 'primary' : 'destructive'
+                    }
                     disabled={currentPage >= totalPages}
                   >
                     Last
@@ -132,4 +150,4 @@ export function allTransactions({ transactions, currentPage = 1 }: Props) {
       </Box>
     </Container>
   );
-};
+}
