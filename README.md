@@ -1,53 +1,225 @@
-# @metamask/template-snap-monorepo
+# Hoosnap - Hoosat Network MetaMask Snap
 
-This repository demonstrates how to develop a snap with TypeScript. For detailed
-instructions, see [the MetaMask documentation](https://docs.metamask.io/guide/snaps.html#serving-a-snap-to-your-local-environment).
+> **Experience the power of Hoosat's lightning-fast transactions directly in MetaMask**
 
-MetaMask Snaps is a system that allows anyone to safely expand the capabilities
-of MetaMask. A _snap_ is a program that we run in an isolated environment that
-can customize the wallet experience.
+Hoosnap is a MetaMask Snap that brings native Hoosat Network (HTN) support to MetaMask, enabling users to send, receive, and manage HTN tokens with secure, non-custodial wallet functionality and fast transaction speeds.
 
-## Snaps is pre-release software
+## 🚀 Features
 
-To interact with (your) Snaps, you will need to install [MetaMask Flask](https://metamask.io/flask/),
-a canary distribution for developers that provides access to upcoming features.
+- **⚡ Lightning Fast Transactions** - Experience near-instant confirmations with Hoosat's blockDAG technology
+- **🔒 Secure & Non-Custodial** - Your private keys never leave MetaMask
+- **📊 Real-Time Insights** - Track transaction history and monitor UTXO health
+- **🔧 Advanced UTXO Management** - UTXO compounding and optimization tools
+- **🌐 Seamless Integration** - Built natively for MetaMask using Snaps technology
+- **🌍 Open Source** - Fully open source and community-driven
 
-## Getting Started
+## 🏁 Quick Start
 
-Clone the template-snap repository [using this template](https://github.com/MetaMask/template-snap-monorepo/generate)
-and set up the development environment:
+### Prerequisites
+
+- [MetaMask Flask](https://metamask.io/flask/) (required for Snaps)
+- Node.js 18.6.0 or higher
+- Yarn package manager
+
+### Installation
+
+1. **Clone the repository**
+
+   ```shell
+   git clone https://github.com/your-org/kaspa-metamask-snap.git
+   cd kaspa-metamask-snap
+   ```
+
+2. **Install dependencies**
+
+   ```shell
+   yarn install
+   ```
+
+3. **Start development environment**
+
+   ```shell
+   yarn start
+   ```
+
+4. **Open the local website**
+   - Navigate to `http://localhost:8000`
+   - Follow the installation prompts to connect Hoosnap to MetaMask Flask
+
+## 🏗️ Architecture
+
+This monorepo contains two main packages:
+
+### 📦 Packages
+
+- **`packages/snap/`** - The MetaMask Snap implementation
+
+  - Written in TypeScript
+  - Handles Hoosat wallet operations, transactions, and UTXO management
+  - Integrates with Hoosat Network APIs
+
+- **`packages/site/`** - The landing page and documentation
+  - Built with Gatsby and React
+  - Modern UI for snap installation and interaction
+  - Real-time connection status and error handling
+
+## 🛠️ Development
+
+### Running the Snap
 
 ```shell
-yarn install && yarn start
+# Start both snap and website in development mode
+yarn start
+
+# Or run individually
+yarn workspace snap start    # Snap development
+yarn workspace site start   # Website development
 ```
 
-## Cloning
+### Testing
 
-This repository contains GitHub Actions that you may find useful, see
-`.github/workflows` and [Releasing & Publishing](https://github.com/MetaMask/template-snap-monorepo/edit/main/README.md#releasing--publishing)
-below for more information.
+```shell
+# Run all tests
+yarn test
 
-If you clone or create this repository outside the MetaMask GitHub organization,
-you probably want to run `./scripts/cleanup.sh` to remove some files that will
-not work properly outside the MetaMask GitHub organization.
+# Run snap tests only
+yarn workspace snap test
 
-If you don't wish to use any of the existing GitHub actions in this repository,
-simply delete the `.github/workflows` directory.
+# Run tests with coverage
+yarn test --coverage
+```
 
-## Contributing
+### Linting and Formatting
 
-### Testing and Linting
+```shell
+# Check for linting issues
+yarn lint
 
-Run `yarn test` to run the tests once.
+# Auto-fix linting issues
+yarn lint:fix
 
-Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and
-fix any automatically fixable issues.
+# Format code
+yarn prettier:write
+```
 
-### Using NPM packages with scripts
+## 📚 Snap Functionality
 
-Scripts are disabled by default for security reasons. If you need to use NPM
-packages with scripts, you can run `yarn allow-scripts auto`, and enable the
-script in the `lavamoat.allowScripts` section of `package.json`.
+### Core Features
 
-See the documentation for [@lavamoat/allow-scripts](https://github.com/LavaMoat/LavaMoat/tree/main/packages/allow-scripts)
-for more information.
+- **Wallet Management** - Generate and manage Hoosat addresses
+- **Balance Checking** - Real-time HTN balance updates
+- **Transaction Sending** - Send HTN with custom fees and recipients
+- **Transaction History** - View complete transaction history with pagination
+- **UTXO Operations** - View, compound, and optimize UTXOs
+- **Network Status** - Monitor connection to Hoosat Network
+
+### API Integration
+
+The snap integrates with:
+
+- **Hoosat Network APIs** for transaction broadcasting
+- **Hoosat Explorer** for transaction details and history
+- **Hoosat SDK** for cryptographic operations and UTXO management
+
+## 🌐 Network Information
+
+- **Network**: Hoosat Mainnet
+- **Token**: HTN (Hoosat Token)
+- **Explorer**: [https://explorer.hoosat.fi/](https://explorer.hoosat.fi/)
+- **API**: Hoosat Network REST API
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create `.env` files in the respective packages:
+
+**`packages/snap/.env`**
+
+```env
+# Snap configuration
+SNAP_ENV=development
+```
+
+**`packages/site/.env`**
+
+```env
+# Website configuration
+GATSBY_SNAP_ORIGIN=local:http://localhost:8080
+```
+
+### Customization
+
+- **Snap behavior** - Modify `packages/snap/src/index.ts`
+- **UI components** - Update files in `packages/snap/src/ui/`
+- **API endpoints** - Configure in `packages/snap/src/api/`
+
+## 🚀 Deployment
+
+### Building for Production
+
+```shell
+# Build both packages
+yarn build
+
+# Build snap only
+yarn workspace snap build
+
+# Build website only
+yarn workspace site build
+```
+
+### Publishing the Snap
+
+1. Update version in `packages/snap/package.json`
+2. Build the snap: `yarn workspace snap build`
+3. The built snap will be in `packages/snap/dist/`
+4. Follow MetaMask's publishing guidelines for snap distribution
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and add tests
+4. Ensure all tests pass: `yarn test`
+5. Lint your code: `yarn lint:fix`
+6. Commit your changes: `git commit -m 'Add amazing feature'`
+7. Push to the branch: `git push origin feature/amazing-feature`
+8. Open a Pull Request
+
+## 🔒 Security
+
+Hoosnap prioritizes security:
+
+- **No Private Key Exposure** - Private keys are generated and stored securely within MetaMask
+- **Isolated Execution** - Runs in MetaMask's secure Snaps environment
+- **Open Source** - All code is publicly auditable
+- **Regular Updates** - Actively maintained with security patches
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🔗 Links
+
+- **Hoosat Network**: [https://network.hoosat.fi/](https://network.hoosat.fi/)
+- **Hoosat Explorer**: [https://explorer.hoosat.fi/](https://explorer.hoosat.fi/)
+- **MetaMask Snaps**: [https://metamask.io/snaps/](https://metamask.io/snaps/)
+- **MetaMask Flask**: [https://metamask.io/flask/](https://metamask.io/flask/)
+
+## ❓ Support
+
+Need help?
+
+- 📖 Check the [documentation](docs/)
+- 🐛 Report issues on [GitHub Issues](https://github.com/your-org/kaspa-metamask-snap/issues)
+- 💬 Join our community discussions
+- 📧 Contact the development team
+
+---
+
+**Built with ❤️ for the Hoosat Network community**

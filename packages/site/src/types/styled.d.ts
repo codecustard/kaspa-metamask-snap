@@ -10,6 +10,9 @@ declare module 'styled-components' {
   export interface DefaultTheme {
     fonts: Record<string, string>;
     fontSizes: Record<string, string>;
+    fontWeights: Record<string, number>;
+    lineHeights: Record<string, number>;
+    spacing: Record<string, string>;
     breakpoints: string[];
     mediaQueries: Record<string, string>;
     radii: Record<string, string>;
