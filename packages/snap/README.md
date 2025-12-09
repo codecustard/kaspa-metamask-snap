@@ -18,7 +18,7 @@ A MetaMask Snap that provides wallet functionality for the Hoosat Network, enabl
 
 ```bash
 # Install the snap from npm registry
-npm install -g hoosnap@0.1.1
+npm install -g hoosnap@0.1.2
 ```
 
 ### Development Setup
@@ -43,7 +43,7 @@ yarn start
 1. **Install MetaMask Flask** (required for snap development)
 2. **Add the Snap** to MetaMask:
 
-   - Production: `npm:hoosnap@0.1.1`
+   - Production: `npm:hoosnap@0.1.2`
    - Development: Connect to `http://localhost:8000`
 
 3. **Access Wallet Features**:

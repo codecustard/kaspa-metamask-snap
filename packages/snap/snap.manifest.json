@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Metamask Snap for Hoosat Network",
   "proposedName": "Hoosnap - Hoosat Wallet",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/codecustard/kaspa-metamask-snap.git"
   },
   "source": {
-    "shasum": "ditWirKESHkoWl4rlMw6Giokp+T2qkJaR+gEZtFGgUk=",
+    "shasum": "KlB3rcJ2uUCUlY6kifjMndV/393kW8kdQz/21SqQ9Q0=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
