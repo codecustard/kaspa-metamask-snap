@@ -35,8 +35,6 @@ export async function sendTransaction(
     // Get UTXOs using SDK
     const utxos = await client.getUtxos([wallet.address]);
 
-    console.log('SDK UTXO response:', utxos);
-
     if (!utxos?.utxos || utxos.utxos.length === 0) {
       return {
         success: false,
@@ -62,11 +60,9 @@ export async function sendTransaction(
 
     // Sign the transaction
     const signedTx = builder.sign();
-    console.log('SDK signed transaction:', signedTx);
 
     // Submit to network using SDK
     const result = await client.submitTransaction(signedTx);
-    console.log('SDK submit result:', result);
 
     if (result?.transactionId) {
       return {
@@ -79,7 +75,7 @@ export async function sendTransaction(
       error: `SDK submit failed: ${JSON.stringify(result)}`,
     };
   } catch (error) {
-    console.error('Send transaction error:', error);
+    // Send transaction error occurred
 
     // Try to show UTXO data if available
     let debugInfo = '';
@@ -131,9 +127,9 @@ export async function testTxBuilder(): Promise<SendTransactionResult> {
 
     // Try to isolate the HoosatTxBuilder issue
     try {
-      const builder = new HoosatTxBuilder();
+      // eslint-disable-next-line no-new
+      new HoosatTxBuilder();
       // Builder created successfully for testing
-      console.log('Builder created:', Boolean(builder));
       return {
         success: true,
         error: 'TxBuilder created successfully - no immediate error',

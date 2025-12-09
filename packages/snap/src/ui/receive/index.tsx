@@ -21,8 +21,8 @@ export async function receive(id: string) {
   try {
     const wallet = await getWallet();
     address = wallet.address;
-  } catch (error) {
-    console.error('Failed to get wallet address:', error);
+  } catch {
+    // Failed to get wallet address
   }
 
   await snap.request({

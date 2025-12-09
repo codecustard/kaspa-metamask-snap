@@ -51,8 +51,8 @@ export async function getWallet(): Promise<WalletState> {
     });
 
     return walletData;
-  } catch (error) {
-    console.error('Hoosat wallet generation failed:', error);
+  } catch {
+    // Hoosat wallet generation failed, fallback to generated key pair
 
     // Fallback to generated key pair
     try {
@@ -71,12 +71,14 @@ export async function getWallet(): Promise<WalletState> {
       });
 
       return walletData;
-    } catch (retryError) {
-      console.error('Retry also failed:', retryError);
+    } catch {
+      // Retry also failed, using mock wallet for demo
 
-      // Mock wallet for demo
-      const mockAddress = `hoosat:qr${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
-      const mockPrivateKey = Math.random().toString(36).substring(2);
+      // Mock wallet for demo - using deterministic fallback
+      const timestamp = Date.now().toString(36);
+      const random = timestamp.split('').reverse().join('');
+      const mockAddress = `hoosat:qr${timestamp}${random}`;
+      const mockPrivateKey = `${timestamp}${random}`.padEnd(64, '0');
 
       const mockWallet: WalletState = {
         address: mockAddress,

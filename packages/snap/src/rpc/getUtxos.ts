@@ -41,14 +41,14 @@ export async function getUtxos(address?: string): Promise<{ utxos: UTXO[] }> {
     );
 
     if (!utxosResponse.ok) {
-      console.error('Failed to fetch UTXOs:', utxosResponse.statusText);
+      // Failed to fetch UTXOs
       return { utxos: [] };
     }
 
     const utxosData = await utxosResponse.json();
 
     if (!utxosData.success || !utxosData.data) {
-      console.error('Invalid UTXOs response:', utxosData);
+      // Invalid UTXOs response
       return { utxos: [] };
     }
 
@@ -78,8 +78,8 @@ export async function getUtxos(address?: string): Promise<{ utxos: UTXO[] }> {
     utxos.sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount));
 
     return { utxos };
-  } catch (error) {
-    console.error('Error fetching UTXOs:', error);
+  } catch {
+    // Error fetching UTXOs
     return { utxos: [] };
   }
 }

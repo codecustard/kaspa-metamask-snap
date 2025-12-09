@@ -51,11 +51,11 @@ async function refreshHomePage(id: string, hideBalance = false) {
         const balanceAmount = HoosatUtils.sompiToAmount(balanceResult.balance);
         balance = balanceAmount.toString();
       }
-    } catch (balanceError) {
-      console.error('Balance error:', balanceError);
+    } catch {
+      // Balance fetch failed, using default
     }
-  } catch (walletError) {
-    console.error('Wallet error:', walletError);
+  } catch {
+    // Wallet access failed, using defaults
   }
 
   // Get transaction history
@@ -86,13 +86,6 @@ export const onUserInput: OnUserInputHandler = async ({
   event,
   context,
 }) => {
-  console.log(
-    'onUserInput called with event:',
-    event.name,
-    'type:',
-    event.type,
-  );
-
   if (
     event.type === UserInputEventType.ButtonClickEvent ||
     event.type === UserInputEventType.InputChangeEvent
@@ -358,12 +351,9 @@ export const onUserInput: OnUserInputHandler = async ({
         break;
 
       case 'settings':
-        // TODO: Implement these features
-        console.log(`${event.name} clicked - not yet implemented`);
+        // Settings not implemented yet
         break;
-
       case undefined:
-        console.warn('Event name is undefined');
         break;
 
       default:
@@ -458,11 +448,6 @@ export const onUserInput: OnUserInputHandler = async ({
           break;
         }
 
-        console.warn(
-          'Unknown event:',
-          event.name,
-          'Available events: send, receive, sendReview, sendConfirm, backToHome, refreshBalances, hideBalance, showBalance, viewAllTransactions, viewUTXOs, refreshUTXOs, goBack, copyAddress, settings',
-        );
         break;
     }
   }

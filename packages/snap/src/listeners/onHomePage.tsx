@@ -21,11 +21,11 @@ export const onHomePage: OnHomePageHandler = async () => {
         const balanceAmount = HoosatUtils.sompiToAmount(balanceResult.balance);
         balance = balanceAmount.toString();
       }
-    } catch (balanceError) {
-      console.error('Balance error:', balanceError);
+    } catch {
+      // Balance fetch failed
     }
-  } catch (walletError) {
-    console.error('Wallet error:', walletError);
+  } catch {
+    // Wallet access failed
   }
 
   // Get transaction history

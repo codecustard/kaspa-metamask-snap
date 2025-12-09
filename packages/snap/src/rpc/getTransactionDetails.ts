@@ -31,10 +31,7 @@ export async function getTransactionDetails(
     );
 
     if (!response.ok) {
-      console.error(
-        'Failed to fetch transaction details:',
-        response.statusText,
-      );
+      // Failed to fetch transaction details
       return null;
     }
 
@@ -54,8 +51,8 @@ export async function getTransactionDetails(
         amount: output.amount,
       })),
     };
-  } catch (error) {
-    console.error('Error fetching transaction details:', error);
+  } catch {
+    // Error fetching transaction details
     return null;
   }
 }

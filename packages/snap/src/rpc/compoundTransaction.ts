@@ -26,8 +26,6 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const utxos = await client.getUtxos([wallet.address]);
 
-    console.log('Compound - UTXO response:', utxos);
-
     if (!utxos?.utxos || utxos.utxos.length === 0) {
       return {
         success: false,
@@ -50,10 +48,6 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
     utxos.utxos.forEach((utxo) => {
       totalAmount += parseInt(utxo.utxoEntry?.amount || '0', 10);
     });
-
-    console.log(
-      `Compounding ${utxos.utxos.length} UTXOs with total amount: ${totalAmount} sompi`,
-    );
 
     // Build transaction using Hoosat SDK
     const builder = new HoosatTxBuilder();
@@ -85,11 +79,9 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
 
     // Sign the transaction
     const signedTx = builder.sign();
-    console.log('Compound - signed transaction:', signedTx);
 
     // Submit to network using SDK
     const result = await client.submitTransaction(signedTx);
-    console.log('Compound - submit result:', result);
 
     if (result?.transactionId) {
       const totalAmountHTN = HoosatUtils.sompiToAmount(totalAmount.toString());
@@ -106,7 +98,7 @@ export async function compoundTransaction(): Promise<CompoundTransactionResult> 
       utxosConsolidated: utxos.utxos.length,
     };
   } catch (error) {
-    console.error('Compound transaction error:', error);
+    // Compound transaction error occurred
 
     const errorMessage = error instanceof Error ? error.message : String(error);
 
@@ -163,8 +155,8 @@ export async function shouldSuggestCompound(): Promise<{
     const suggest = utxoCount > 10;
 
     return { suggest, utxoCount };
-  } catch (error) {
-    console.error('Error checking compound suggestion:', error);
+  } catch {
+    // Error checking compound suggestion
     return { suggest: false, utxoCount: 0 };
   }
 }

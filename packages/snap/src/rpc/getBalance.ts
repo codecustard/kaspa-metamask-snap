@@ -57,10 +57,7 @@ export async function debugBalance(): Promise<
 > {
   try {
     const wallet = await getWallet();
-    console.log('Debug wallet:', wallet);
-
     const balanceResult = await client.getBalance(wallet.address);
-    console.log('Debug balance result:', balanceResult);
 
     return {
       address: wallet.address,
@@ -70,7 +67,6 @@ export async function debugBalance(): Promise<
         !wallet.address.includes('qr1234'),
     };
   } catch (error) {
-    console.error('Debug balance error:', error);
     return { error: error instanceof Error ? error.message : 'Unknown error' };
   }
 }
