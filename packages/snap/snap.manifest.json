@@ -1,18 +1,18 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Metamask Snap for Hoosat Network",
-  "proposedName": "Hoosat Network",
+  "proposedName": "Hoosnap - Hoosat Wallet",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/codecustard/kaspa-metamask-snap.git"
   },
   "source": {
-    "shasum": "ks0g9LK2MCXWVCZBJIJsn3x86Eo2k2mG5kUPTqpGv4Q=",
+    "shasum": "GqC4CZRLgKTleTzUcRCQdiM/IAxXJIg/5dcQR2mo21s=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "snap",
+        "packageName": "hoosnap",
         "registry": "https://registry.npmjs.org/"
       }
     }

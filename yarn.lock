@@ -11844,6 +11844,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hoosnap@workspace:packages/snap":
+  version: 0.0.0-use.local
+  resolution: "hoosnap@workspace:packages/snap"
+  dependencies:
+    "@jest/globals": ^29.5.0
+    "@metamask/snaps-cli": ^8.3.0
+    "@metamask/snaps-jest": ^9.4.0
+    "@metamask/snaps-sdk": ~9.3.0
+    "@types/react": 18.2.4
+    "@types/react-dom": 18.2.4
+    eslint: ^9.11.0
+    hoosat-sdk-web: ^0.1.5
+    jest: ^29.5.0
+    rimraf: ^3.0.2
+    ts-jest: ^29.1.0
+    typescript: ~5.7.3
+  languageName: unknown
+  linkType: soft
+
 "hosted-git-info@npm:^3.0.8":
   version: 3.0.8
   resolution: "hosted-git-info@npm:3.0.8"
@@ -17707,25 +17726,6 @@ __metadata:
   checksum: 0a7a79900bbb36f8aaa922cf111702a3647ac6165736d5dc96d3ef367efc50465cac70c53cd172c382b022dac72ec91710608e5393de71f76d7142e6fd80e8a3
   languageName: node
   linkType: hard
-
-"snap@workspace:packages/snap":
-  version: 0.0.0-use.local
-  resolution: "snap@workspace:packages/snap"
-  dependencies:
-    "@jest/globals": ^29.5.0
-    "@metamask/snaps-cli": ^8.3.0
-    "@metamask/snaps-jest": ^9.4.0
-    "@metamask/snaps-sdk": ~9.3.0
-    "@types/react": 18.2.4
-    "@types/react-dom": 18.2.4
-    eslint: ^9.11.0
-    hoosat-sdk-web: ^0.1.5
-    jest: ^29.5.0
-    rimraf: ^3.0.2
-    ts-jest: ^29.1.0
-    typescript: ~5.7.3
-  languageName: unknown
-  linkType: soft
 
 "socket.io-adapter@npm:~2.5.2":
   version: 2.5.4
