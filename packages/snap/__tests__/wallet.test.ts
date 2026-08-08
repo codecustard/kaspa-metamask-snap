@@ -30,17 +30,15 @@ describe('Wallet functionality', () => {
       expect(typeof result.address).toBe('string');
     });
 
-    it('should return fallback address on error', async () => {
-      // Mock wallet error
+    it('should throw instead of returning a fabricated address on error', async () => {
+      // Mock wallet error on every snap.request call (state lookup, entropy
+      // derivation, and the generateKeyPair fallback all fail)
       // @ts-expect-error - snap mock
       (global.snap.request as jest.Mock).mockRejectedValue(
         new Error('Wallet error'),
       );
 
-      const result = await generateAddress();
-
-      expect(result).toHaveProperty('address');
-      expect(result.address).toMatch(/^hoosat:/u);
+      await expect(generateAddress()).rejects.toThrow('Wallet error');
     });
   });
 

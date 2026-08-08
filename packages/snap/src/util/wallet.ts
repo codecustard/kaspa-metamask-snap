@@ -51,10 +51,11 @@ export async function getWallet(): Promise<WalletState> {
     });
 
     return walletData;
-  } catch {
-    // Hoosat wallet generation failed, fallback to generated key pair
-
-    // Fallback to generated key pair
+  } catch (entropyError) {
+    // Deterministic derivation from the MetaMask seed failed. Fall back to a
+    // freshly generated key pair (backed by a real CSPRNG), but never
+    // fabricate key material — a wallet with guessable entropy is worse than
+    // no wallet at all.
     try {
       const wallet = HoosatCrypto.generateKeyPair();
       const walletData: WalletState = {
@@ -71,29 +72,18 @@ export async function getWallet(): Promise<WalletState> {
       });
 
       return walletData;
-    } catch {
-      // Retry also failed, using mock wallet for demo
-
-      // Mock wallet for demo - using deterministic fallback
-      const timestamp = Date.now().toString(36);
-      const random = timestamp.split('').reverse().join('');
-      const mockAddress = `hoosat:qr${timestamp}${random}`;
-      const mockPrivateKey = `${timestamp}${random}`.padEnd(64, '0');
-
-      const mockWallet: WalletState = {
-        address: mockAddress,
-        privateKey: mockPrivateKey,
-      };
-
-      await snap.request({
-        method: 'snap_manageState',
-        params: {
-          operation: 'update',
-          newState: { wallet: mockWallet },
-        },
-      });
-
-      return mockWallet;
+    } catch (generateError) {
+      throw new Error(
+        `Failed to create Hoosat wallet: unable to derive a key from the MetaMask seed (${
+          entropyError instanceof Error
+            ? entropyError.message
+            : String(entropyError)
+        }) and unable to generate a new key pair (${
+          generateError instanceof Error
+            ? generateError.message
+            : String(generateError)
+        }).`,
+      );
     }
   }
 }
