@@ -2962,8 +2962,8 @@ __metadata:
   linkType: hard
 
 "@metamask/eslint-config@npm:^14.0.0":
-  version: 14.0.0
-  resolution: "@metamask/eslint-config@npm:14.0.0"
+  version: 14.1.0
+  resolution: "@metamask/eslint-config@npm:14.1.0"
   dependencies:
     "@eslint/js": ^9.11.0
     globals: ^15.9.0
@@ -2975,7 +2975,7 @@ __metadata:
     eslint-plugin-prettier: ^5.2.1
     eslint-plugin-promise: ^7.1.0
     prettier: ^3.3.3
-  checksum: 433313e318718ef68cb2e6e6398f935b1835c59b0f5abbab78a4b2b1d13d9d54d8cf1456ee911c3b438a4e6ac640f239ca4ac7f1dca387cec6547b9a3330df5a
+  checksum: bdba35bbd573aca8fa5fee756cf605ebeb7a302379a463d25c1743864a199bab4eaf27cfdd2e93625d39590c360f4358d1992ac2ca41e4b878e55def47993083
   languageName: node
   linkType: hard
 
